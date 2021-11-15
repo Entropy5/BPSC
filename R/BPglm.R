@@ -235,6 +235,8 @@ BPglm <- function (data, controlIds, design, coef=2, keepFit=FALSE,minExp=1e-4, 
                 fit=glm(x~.,data=fdat,family=fam0)
                 i.pval=summary(fit)$coefficients[coef,4]
                 i.tval=summary(fit)$coefficients[coef,3]
+                i.stde=summary(fit)$coefficients[coef,2]
+                i.esti=summary(fit)$coefficients[coef,1]
                 i.bpconverged=fit$converged
                 ##### if the fitting is not converged, use quassipoisson
                 i.converged=i.bpconverged
@@ -242,6 +244,8 @@ BPglm <- function (data, controlIds, design, coef=2, keepFit=FALSE,minExp=1e-4, 
                     fit=glm(x~.,data=fdat,family=quasipoisson)
                     i.pval=summary(fit)$coefficients[coef,4]
                     i.tval=summary(fit)$coefficients[coef,3]
+                    i.stde=summary(fit)$coefficients[coef,2]
+                    i.esti=summary(fit)$coefficients[coef,1]
                     i.converged=fit$converged
                 }
             }, silent=TRUE) # keep silent if errors occur
@@ -277,6 +281,8 @@ BPglm <- function (data, controlIds, design, coef=2, keepFit=FALSE,minExp=1e-4, 
     res=list();            
     res[["PVAL"]]=i.pval
     res[["TVAL"]]=i.tval
+    res[["STDE"]]=i.stde
+    res[["ESTI"]]=i.esti
     res[["CONVERGED"]]=i.converged
     res[["BPCONVERGED"]]=i.bpconverged
     res[["ind"]]=i
@@ -294,12 +300,18 @@ BPglm <- function (data, controlIds, design, coef=2, keepFit=FALSE,minExp=1e-4, 
     names(PVAL)=rownames(data)
     TVAL=unlist(fitRes[which(names(fitRes)=="TVAL")])
     names(TVAL)=rownames(data)
+    STDE=unlist(fitRes[which(names(fitRes)=="STDE")])
+    names(STDE)=rownames(data)
+    ESTI=unlist(fitRes[which(names(fitRes)=="ESTI")])
+    names(ESTI)=rownames(data)
     CONVERGED=unlist(fitRes[which(names(fitRes)=="CONVERGED")])
     names(CONVERGED)=rownames(data)
     PVAL[which(!CONVERGED)]=NA
     TVAL[which(!CONVERGED)]=NA
+    STDE[which(!CONVERGED)]=NA
+    ESTI[which(!CONVERGED)]=NA
     
-    res=list(PVAL=PVAL,TVAL=TVAL,ind=ind,fitRes=fitRes,keepFit=keepFit,coef=coef)
+    res=list(PVAL=PVAL,TVAL=TVAL,STDE=STDE,ESTI=ESTI,ind=ind,fitRes=fitRes,keepFit=keepFit,coef=coef)
     class(res) <- "BPglm"
     return(res)
 }
